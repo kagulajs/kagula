@@ -1,0 +1,48 @@
+{
+	"compilerOptions": {
+		// Base configuration
+		"target": "ESNext",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"lib": [
+			"DOM",
+			"DOM.Iterable",
+			"ESNext",
+			"WebWorker",
+			"WebWorker.ImportScripts"
+		],
+
+		// Type checking
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+		"useUnknownInCatchVariables": true,
+		"noFallthroughCasesInSwitch": true,
+		"exactOptionalPropertyTypes": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+
+		// Module resolution
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["src/*"]
+		},
+		"esModuleInterop": true,
+		"isolatedModules": true,
+
+		// Output options
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"inlineSources": true,
+
+		// Performance optimizations
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+}

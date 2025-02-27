@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Distribution
+dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# Others
+.DS_Store
