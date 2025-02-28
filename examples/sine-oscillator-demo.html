@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Sine Oscillator Demo (440Hz)</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 2rem;
+        line-height: 1.5;
+      }
+
+      h1 {
+        margin-bottom: 2rem;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        background: #4a55af;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+
+      button:hover {
+        background: #5d69cf;
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .note-info {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 4px;
+        background: #f0f0f0;
+      }
+
+      .status {
+        padding: 1rem;
+        border-radius: 4px;
+        background: #f5f5f5;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simple Sine Oscillator Demo</h1>
+
+    <div class="controls">
+      <div class="control-group">
+        <button id="initButton">Initialize</button>
+        <button id="playButton" disabled>Start</button>
+      </div>
+    </div>
+
+    <div class="note-info">
+      <strong>Note:</strong> This oscillator plays a fixed 440Hz sine wave (A4
+      musical note).
+    </div>
+
+    <div class="status" id="status">Status: Not initialized</div>
+
+    <script type="module">
+      // Import SineOscillator
+      import SineOscillator from "../dist/index.js";
+
+      // Get DOM elements
+      const initButton = document.getElementById("initButton");
+      const playButton = document.getElementById("playButton");
+      const statusElement = document.getElementById("status");
+
+      // Create oscillator instance
+      const oscillator = new SineOscillator();
+
+      // Initialize handler
+      initButton.addEventListener("click", async () => {
+        try {
+          statusElement.textContent = "Status: Initializing...";
+          await oscillator.initialize();
+
+          initButton.disabled = true;
+          playButton.disabled = false;
+
+          statusElement.textContent = "Status: Initialized";
+        } catch (error) {
+          statusElement.textContent = `Status: Error - ${error.message}`;
+          console.error("Initialization error:", error);
+        }
+      });
+
+      // Play/stop toggle handler
+      playButton.addEventListener("click", () => {
+        try {
+          const isPlaying = oscillator.togglePlay();
+          playButton.textContent = isPlaying ? "Stop" : "Start";
+          statusElement.textContent = `Status: ${
+            isPlaying ? "Playing" : "Stopped"
+          }`;
+        } catch (error) {
+          statusElement.textContent = `Status: Error - ${error.message}`;
+          console.error("Playback error:", error);
+        }
+      });
+
+      // Cleanup on page unload
+      window.addEventListener("beforeunload", () => {
+        oscillator.dispose();
+      });
+    </script>
+  </body>
+</html>
