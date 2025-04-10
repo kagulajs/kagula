@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { InvalidArgumentError } from "./errors.js";
+import { InvalidArgumentError } from "../errors.js";
 import { Seconds, Ticks } from "./time.js";
 
 describe("Seconds", () => {

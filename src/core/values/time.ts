@@ -1,4 +1,4 @@
-import { InvalidArgumentError } from "./errors.js";
+import { InvalidArgumentError } from "../errors.js";
 
 /**
  * Represents a time value in seconds.

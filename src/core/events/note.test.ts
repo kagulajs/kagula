@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { InvalidArgumentError } from "../errors.js";
-import { Ticks } from "../time.js";
+import { Pitch } from "../values/pitch.js";
+import { Ticks } from "../values/time.js";
+import { Velocity } from "../values/velocity.js";
 import { Note } from "./note.js";
-import { Pitch, Velocity } from "./values.js";
 
 describe("Note", () => {
 	describe("constructor", () => {

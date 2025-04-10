@@ -1,7 +1,8 @@
 import { InvalidArgumentError } from "../errors.js";
-import { Ticks } from "../time.js";
+import { Pitch } from "../values/pitch.js";
+import { Ticks } from "../values/time.js";
+import { Velocity } from "../values/velocity.js";
 import { Event } from "./base.js";
-import { Pitch, Velocity } from "./values.js";
 
 /**
  * Represents a note event.

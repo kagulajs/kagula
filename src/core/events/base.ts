@@ -1,5 +1,5 @@
 import { InvalidArgumentError } from "../errors.js";
-import { Ticks } from "../time.js";
+import { Ticks } from "../values/time.js";
 
 /**
  * Base class for all events.
