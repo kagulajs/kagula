@@ -21,7 +21,7 @@ describe("Project", () => {
 	// Helper function to create a track with notes
 	const createTrack = (noteTimes: number[] = []) => {
 		const notes = noteTimes.map((time) => createNote(time));
-		return new Track(notes);
+		return Track.create(notes);
 	};
 
 	describe("constructor", () => {
@@ -78,7 +78,7 @@ describe("Project", () => {
 			const track2 = createTrack([960]);
 			const project = new Project([track1, track2]);
 
-			const updatedProject = project.removeTrack(track1);
+			const updatedProject = project.removeTrack(track1.id);
 
 			// Original project should be unchanged
 			expect(project.getTracks().length).toBe(2);
@@ -93,8 +93,9 @@ describe("Project", () => {
 			const track1 = createTrack([480]);
 			const project = new Project([track1]);
 
-			const trackNotInProject = createTrack([960]);
-			const updatedProject = project.removeTrack(trackNotInProject);
+			// Use a non-existent ID
+			const nonExistentId = "non-existent-id";
+			const updatedProject = project.removeTrack(nonExistentId);
 
 			expect(updatedProject.getTracks().length).toBe(1);
 			expect(updatedProject.getTracks()[0]).toBe(track1);
@@ -124,22 +125,22 @@ describe("Project", () => {
 		});
 	});
 
-	describe("getTrackAt", () => {
-		it("returns the track at the specified index", () => {
+	describe("accessing tracks by index", () => {
+		it("can access tracks by array index using getTracks()", () => {
 			const track1 = createTrack([480]);
 			const track2 = createTrack([960]);
 			const project = new Project([track1, track2]);
 
-			expect(project.getTrackAt(0)).toBe(track1);
-			expect(project.getTrackAt(1)).toBe(track2);
+			expect(project.getTracks()[0]).toBe(track1);
+			expect(project.getTracks()[1]).toBe(track2);
 		});
 
-		it("returns undefined if the index is out of bounds", () => {
+		it("returns undefined when accessing out of bounds indices", () => {
 			const track = createTrack([480]);
 			const project = new Project([track]);
 
-			expect(project.getTrackAt(-1)).toBeUndefined();
-			expect(project.getTrackAt(1)).toBeUndefined();
+			expect(project.getTracks()[-1]).toBeUndefined();
+			expect(project.getTracks()[1]).toBeUndefined();
 		});
 	});
 

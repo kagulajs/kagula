@@ -16,7 +16,7 @@ import { Track } from "./track.js";
  * import { Velocity } from "./values/velocity.js";
  *
  * const project = new Project();
- * const track = new Track();
+ * const track = Track.create();
  * const note = new Note(
  *   new Ticks(480),
  *   new Pitch(60),
@@ -26,11 +26,12 @@ import { Track } from "./track.js";
  *
  * const updatedTrack = track.addEvent(note);
  * const updatedProject = project.addTrack(updatedTrack);
+ * const retrievedTrack = project.getTrack(track.id);
  * ```
  */
 export class Project {
-	/** The tracks contained in this project. */
-	private readonly tracks: ReadonlyArray<Track>;
+	/** Map of track IDs to Track instances */
+	private readonly tracks: ReadonlyMap<string, Track>;
 
 	/**
 	 * Creates a new project instance.
@@ -48,7 +49,13 @@ export class Project {
 			}
 		}
 
-		this.tracks = [...tracks];
+		// Create a map of track IDs to Track instances
+		const tracksMap = new Map<string, Track>();
+		for (const track of tracks) {
+			tracksMap.set(track.id, track);
+		}
+
+		this.tracks = tracksMap;
 	}
 
 	/**
@@ -65,21 +72,25 @@ export class Project {
 			);
 		}
 
+		// Get all current tracks as an array
+		const currentTracks = Array.from(this.tracks.values());
+
 		// Create a new array with all existing tracks plus the new one
-		const newTracks = [...this.tracks, track];
+		const newTracks = [...currentTracks, track];
 
 		// Return a new Project instance with the updated tracks
 		return new Project(newTracks);
 	}
 
 	/**
-	 * Removes a track from the project.
+	 * Removes a track from the project by its ID.
 	 *
-	 * @param track - The track to remove
+	 * @param trackId - The ID of the track to remove
 	 * @returns A new Project instance with the track removed
 	 */
-	removeTrack(track: Track): Project {
-		const newTracks = this.tracks.filter((t) => t !== track);
+	removeTrack(trackId: string): Project {
+		const currentTracks = Array.from(this.tracks.values());
+		const newTracks = currentTracks.filter((t) => t.id !== trackId);
 		return new Project(newTracks);
 	}
 
@@ -89,20 +100,17 @@ export class Project {
 	 * @returns An array of all tracks in the project
 	 */
 	getTracks(): Track[] {
-		return this.tracks as Track[];
+		return Array.from(this.tracks.values());
 	}
 
 	/**
-	 * Gets a track at the specified index.
+	 * Gets a track by its ID.
 	 *
-	 * @param index - The index of the track to get
-	 * @returns The track at the specified index, or undefined if the index is out of bounds
+	 * @param trackId - The ID of the track to get
+	 * @returns The track with the specified ID, or undefined if not found
 	 */
-	getTrackAt(index: number): Track | undefined {
-		if (index < 0 || index >= this.tracks.length) {
-			return undefined;
-		}
-		return this.tracks[index];
+	getTrack(trackId: string): Track | undefined {
+		return this.tracks.get(trackId);
 	}
 
 	/**
@@ -111,6 +119,6 @@ export class Project {
 	 * @returns The number of tracks in the project
 	 */
 	getTrackCount(): number {
-		return this.tracks.length;
+		return this.tracks.size;
 	}
 }

@@ -1,6 +1,6 @@
+import { generateId } from "../lib/id.js";
 import { InvalidArgumentError } from "./errors.js";
 import { Event } from "./events/base.js";
-import { generateId } from "../lib/id.js";
 
 /**
  * Represents a track that contains a collection of events.

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { generateId } from "../lib/id.js";
 import { InvalidArgumentError } from "./errors.js";
 import { Note } from "./events/note.js";
 import { Track } from "./track.js";
 import { Pitch } from "./values/pitch.js";
 import { Ticks } from "./values/time.js";
 import { Velocity } from "./values/velocity.js";
-import { generateId } from "../lib/id.js";
 
 describe("Track", () => {
 	// Helper function to create a note event
@@ -46,7 +46,10 @@ describe("Track", () => {
 
 		it("throws an error if any provided event is not an Event instance", () => {
 			expect(() => {
-				new Track(generateId(), [createNote(480), "not an event" as unknown as Note]);
+				new Track(generateId(), [
+					createNote(480),
+					"not an event" as unknown as Note,
+				]);
 			}).toThrow(InvalidArgumentError);
 		});
 	});
