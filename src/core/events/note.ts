@@ -1,3 +1,4 @@
+import { generateId } from "../../lib/id.js";
 import { InvalidArgumentError } from "../errors.js";
 import { Pitch } from "../values/pitch.js";
 import { Ticks } from "../values/time.js";
@@ -30,14 +31,23 @@ export class Note extends Event {
 	readonly duration: Ticks;
 
 	/**
+	 * Creates a new note with the specified ID and parameters.
+	 *
+	 * @param id - The unique identifier for this note
 	 * @param time - The time at which the note starts
 	 * @param pitch - The pitch value
 	 * @param velocity - The velocity/intensity value
 	 * @param duration - The duration of the note
 	 * @throws {InvalidArgumentError} If any parameter is invalid
 	 */
-	constructor(time: Ticks, pitch: Pitch, velocity: Velocity, duration: Ticks) {
-		super(time);
+	constructor(
+		id: string,
+		time: Ticks,
+		pitch: Pitch,
+		velocity: Velocity,
+		duration: Ticks,
+	) {
+		super(id, time);
 
 		// Validate pitch
 		if (!(pitch instanceof Pitch)) {
@@ -68,5 +78,24 @@ export class Note extends Event {
 		this.pitch = pitch;
 		this.velocity = velocity;
 		this.duration = duration;
+	}
+
+	/**
+	 * Creates a new note with the specified parameters and an auto-generated ID.
+	 *
+	 * @param time - The time at which the note starts
+	 * @param pitch - The pitch value
+	 * @param velocity - The velocity/intensity value
+	 * @param duration - The duration of the note
+	 * @returns A new note instance with an auto-generated ID
+	 * @throws {InvalidArgumentError} If any parameter is invalid
+	 */
+	static override create(
+		time: Ticks,
+		pitch: Pitch,
+		velocity: Velocity,
+		duration: Ticks,
+	): Note {
+		return new Note(generateId(), time, pitch, velocity, duration);
 	}
 }

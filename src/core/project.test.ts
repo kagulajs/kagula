@@ -10,7 +10,7 @@ import { Velocity } from "./values/velocity.js";
 describe("Project", () => {
 	// Helper function to create a note event
 	const createNote = (time: number, duration = 240) => {
-		return new Note(
+		return Note.create(
 			new Ticks(time),
 			new Pitch(60),
 			new Velocity(100),
