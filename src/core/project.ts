@@ -1,4 +1,5 @@
 import { InvalidArgumentError } from "./errors.js";
+import { Event } from "./events/base.js";
 import { Track } from "./track.js";
 
 /**
@@ -33,6 +34,9 @@ export class Project {
 	/** Map of track IDs to Track instances */
 	private readonly tracks: ReadonlyMap<string, Track>;
 
+	/** Cached array of all tracks for performance */
+	private readonly tracksArray: ReadonlyArray<Track>;
+
 	/**
 	 * Creates a new project instance.
 	 *
@@ -56,6 +60,7 @@ export class Project {
 		}
 
 		this.tracks = tracksMap;
+		this.tracksArray = tracks;
 	}
 
 	/**
@@ -120,5 +125,114 @@ export class Project {
 	 */
 	getTrackCount(): number {
 		return this.tracks.size;
+	}
+
+	/**
+	 * Adds an event to a specific track in the project.
+	 *
+	 * @param trackId - The ID of the track to add the event to
+	 * @param event - The event to add
+	 * @returns A new Project instance with the added event
+	 * @throws {InvalidArgumentError} If the track is not found or event is not a valid Event instance
+	 */
+	addEvent(trackId: string, event: Event): Project {
+		const track = this.getTrack(trackId);
+		if (!track) {
+			throw new InvalidArgumentError(
+				`Cannot add event to track: Track with ID ${trackId} not found`,
+			);
+		}
+
+		if (!(event instanceof Event)) {
+			throw new InvalidArgumentError(
+				`Event must be an Event instance. Received: ${event}`,
+			);
+		}
+
+		// Create a new track with the added event
+		const updatedTrack = track.addEvent(event);
+
+		// Get all current tracks as an array
+		const currentTracks = this.tracksArray;
+
+		// Create a new array with the updated track replacing the old one
+		const newTracks = currentTracks.map((t) =>
+			t.id === trackId ? updatedTrack : t,
+		);
+
+		// Return a new Project instance with the updated tracks
+		return new Project(newTracks);
+	}
+
+	/**
+	 * Removes an event from a specific track in the project.
+	 *
+	 * @param trackId - The ID of the track to remove the event from
+	 * @param eventId - The ID of the event to remove
+	 * @returns A new Project instance with the event removed
+	 * @throws {InvalidArgumentError} If the track is not found
+	 */
+	removeEvent(trackId: string, eventId: string): Project {
+		const track = this.getTrack(trackId);
+		if (!track) {
+			throw new InvalidArgumentError(
+				`Cannot remove event from track: Track with ID ${trackId} not found`,
+			);
+		}
+
+		// Create a new track with the event removed
+		const updatedTrack = track.removeEvent(eventId);
+
+		// Get all current tracks as an array
+		const currentTracks = this.tracksArray;
+
+		// Create a new array with the updated track replacing the old one
+		const newTracks = currentTracks.map((t) =>
+			t.id === trackId ? updatedTrack : t,
+		);
+
+		// Return a new Project instance with the updated tracks
+		return new Project(newTracks);
+	}
+
+	/**
+	 * Gets all events from all tracks within a specific time range.
+	 *
+	 * @param startTicks - The start time in ticks
+	 * @param endTicks - The end time in ticks
+	 * @returns An array of events within the specified range from all tracks
+	 */
+	getEventsInRange(startTicks: number, endTicks: number): Event[] {
+		if (startTicks < 0 || endTicks < startTicks) {
+			throw new InvalidArgumentError(
+				`Invalid time range: start=${startTicks}, end=${endTicks}`,
+			);
+		}
+
+		// Get events from all tracks and flatten into a single array
+		const events: Event[] = [];
+		for (const track of this.tracksArray) {
+			const trackEvents = track.getEventsInRange(startTicks, endTicks);
+			events.push(...trackEvents);
+		}
+
+		// Sort events by time
+		return events.sort((a, b) => a.time.value - b.time.value);
+	}
+
+	/**
+	 * Gets all events from all tracks in this project.
+	 *
+	 * @returns An array of all events from all tracks, sorted by time
+	 */
+	getEvents(): Event[] {
+		// Get events from all tracks and flatten into a single array
+		const events: Event[] = [];
+		for (const track of this.tracksArray) {
+			events.push(...track.getEvents());
+		}
+
+		// Sort events by time
+		return events.sort((a, b) => a.time.value - b.time.value);
 	}
 }

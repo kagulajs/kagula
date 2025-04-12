@@ -158,4 +158,173 @@ describe("Project", () => {
 			expect(finalProject.getTrackCount()).toBe(2);
 		});
 	});
+
+	describe("addEvent", () => {
+		it("adds an event to a track in the project", () => {
+			const track = createTrack([]);
+			const project = new Project([track]);
+			const note = createNote(480);
+			const updatedProject = project.addEvent(track.id, note);
+
+			// Original project should be unchanged
+			expect(project.getTrack(track.id)?.getEvents().length).toBe(0);
+
+			// New project should have the track with the event
+			const updatedTrack = updatedProject.getTrack(track.id);
+			expect(updatedTrack?.getEvents().length).toBe(1);
+			expect(updatedTrack?.getEvents()[0]).toBe(note);
+		});
+
+		it("throws an error if the track is not found", () => {
+			const project = new Project();
+			const note = createNote(480);
+
+			expect(() => {
+				project.addEvent("non-existent-track-id", note);
+			}).toThrow(InvalidArgumentError);
+		});
+
+		it("throws an error if the provided event is not an Event instance", () => {
+			const track = createTrack([]);
+			const project = new Project([track]);
+
+			expect(() => {
+				project.addEvent(track.id, "not an event" as unknown as Note);
+			}).toThrow(InvalidArgumentError);
+		});
+	});
+
+	describe("removeEvent", () => {
+		it("removes an event from a track in the project", () => {
+			const note = createNote(480);
+			const track = Track.create([note]);
+			const project = new Project([track]);
+
+			const updatedProject = project.removeEvent(track.id, note.id);
+
+			// Original project should be unchanged
+			expect(project.getTrack(track.id)?.getEvents().length).toBe(1);
+
+			// New project should have the track with the event removed
+			const updatedTrack = updatedProject.getTrack(track.id);
+			expect(updatedTrack?.getEvents().length).toBe(0);
+		});
+
+		it("throws an error if the track is not found", () => {
+			const note = createNote(480);
+			const track = Track.create([note]);
+			const project = new Project([track]);
+
+			expect(() => {
+				project.removeEvent("non-existent-track-id", note.id);
+			}).toThrow(InvalidArgumentError);
+		});
+
+		it("returns a new project with the same tracks if the event to remove is not found", () => {
+			const note = createNote(480);
+			const track = Track.create([note]);
+			const project = new Project([track]);
+
+			// Use a non-existent ID
+			const nonExistentId = "non-existent-id";
+			const updatedProject = project.removeEvent(track.id, nonExistentId);
+
+			// Track should still have the original event
+			const updatedTrack = updatedProject.getTrack(track.id);
+			expect(updatedTrack?.getEvents().length).toBe(1);
+			expect(updatedTrack?.getEvents()[0]).toBe(note);
+		});
+	});
+
+	describe("getEventsInRange", () => {
+		it("returns all events within the specified time range from all tracks", () => {
+			const note1 = createNote(100);
+			const note2 = createNote(200);
+			const note3 = createNote(300);
+			const note4 = createNote(400);
+			const note5 = createNote(500);
+
+			const track1 = Track.create([note1, note3, note5]);
+			const track2 = Track.create([note2, note4]);
+			const project = new Project([track1, track2]);
+
+			// Get events in range 150-350
+			const eventsInRange = project.getEventsInRange(150, 350);
+
+			expect(eventsInRange.length).toBe(2);
+			expect(eventsInRange).toContain(note2);
+			expect(eventsInRange).toContain(note3);
+
+			// Events should be sorted by time
+			expect(eventsInRange[0]).toBe(note2);
+			expect(eventsInRange[1]).toBe(note3);
+		});
+
+		it("returns an empty array if no events are within the specified range", () => {
+			const note1 = createNote(100);
+			const note2 = createNote(200);
+			const track = Track.create([note1, note2]);
+			const project = new Project([track]);
+
+			const eventsInRange = project.getEventsInRange(300, 400);
+
+			expect(eventsInRange).toEqual([]);
+		});
+
+		it("throws an error if the time range is invalid", () => {
+			const project = new Project();
+
+			// Negative start time
+			expect(() => {
+				project.getEventsInRange(-100, 200);
+			}).toThrow(InvalidArgumentError);
+
+			// End time before start time
+			expect(() => {
+				project.getEventsInRange(200, 100);
+			}).toThrow(InvalidArgumentError);
+		});
+	});
+
+	describe("getEvents", () => {
+		it("returns all events from all tracks sorted by time", () => {
+			const note1 = createNote(300);
+			const note2 = createNote(100);
+			const note3 = createNote(500);
+			const note4 = createNote(200);
+			const note5 = createNote(400);
+
+			const track1 = Track.create([note1, note3, note5]);
+			const track2 = Track.create([note2, note4]);
+			const project = new Project([track1, track2]);
+
+			const allEvents = project.getEvents();
+
+			expect(allEvents.length).toBe(5);
+
+			// Events should be sorted by time
+			expect(allEvents[0]).toBe(note2); // 100
+			expect(allEvents[1]).toBe(note4); // 200
+			expect(allEvents[2]).toBe(note1); // 300
+			expect(allEvents[3]).toBe(note5); // 400
+			expect(allEvents[4]).toBe(note3); // 500
+		});
+
+		it("returns an empty array for a project with no events", () => {
+			const track = Track.create([]);
+			const project = new Project([track]);
+
+			const allEvents = project.getEvents();
+
+			expect(allEvents).toEqual([]);
+		});
+
+		it("returns an empty array for a project with no tracks", () => {
+			const project = new Project();
+
+			const allEvents = project.getEvents();
+
+			expect(allEvents).toEqual([]);
+		});
+	});
 });
