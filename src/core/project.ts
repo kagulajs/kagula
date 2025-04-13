@@ -1,6 +1,6 @@
 import { InvalidArgumentError } from "./errors.js";
 import { Event } from "./events/base.js";
-import { Track } from "./track.js";
+import { Track, type TrackProps } from "./track.js";
 
 /**
  * Represents a project that contains a collection of tracks.
@@ -17,7 +17,12 @@ import { Track } from "./track.js";
  * import { Velocity } from "./values/velocity.js";
  *
  * const project = new Project();
- * const track = Track.create();
+ *
+ * // Create a new track through the project
+ * const [project2, pianoTrack] = project.addTrack({ name: "Piano" });
+ * const pianoTrackId = pianoTrack.id;
+ *
+ * // Create a note
  * const note = new Note(
  *   new Ticks(480),
  *   new Pitch(60),
@@ -25,9 +30,11 @@ import { Track } from "./track.js";
  *   new Ticks(240)
  * );
  *
- * const updatedTrack = track.addEvent(note);
- * const updatedProject = project.addTrack(updatedTrack);
- * const retrievedTrack = project.getTrack(track.id);
+ * // Add the note to the track through the project
+ * const project3 = project2.addEvent(pianoTrackId, note);
+ *
+ * // Retrieve the track
+ * const retrievedTrack = project3.getTrack(pianoTrackId);
  * ```
  */
 export class Project {
@@ -64,13 +71,32 @@ export class Project {
 	}
 
 	/**
-	 * Adds a track to the project.
+	 * Creates a new track with the given properties and adds it to the project.
+	 *
+	 * @param props - Optional properties for the new track
+	 * @returns A tuple containing the new Project instance and the created Track
+	 */
+	addTrack(props?: TrackProps): [Project, Track] {
+		// Create a new track with the given properties
+		const track = Track.create(props);
+
+		// Add the track to the project
+		const newProject = this.addTrackInstance(track);
+
+		// Return both the new project and the created track
+		return [newProject, track];
+	}
+
+	/**
+	 * Adds an existing track instance to the project.
+	 * This is an internal method used by addTrack.
 	 *
 	 * @param track - The track to add
 	 * @returns A new Project instance with the added track
 	 * @throws {InvalidArgumentError} If the track is not a valid Track instance
+	 * @internal
 	 */
-	addTrack(track: Track): Project {
+	private addTrackInstance(track: Track): Project {
 		if (!(track instanceof Track)) {
 			throw new InvalidArgumentError(
 				`Project track must be a Track instance. Received: ${track}`,

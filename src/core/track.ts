@@ -3,6 +3,16 @@ import { InvalidArgumentError } from "./errors.js";
 import { Event } from "./events/base.js";
 
 /**
+ * Properties for creating a track.
+ */
+export interface TrackProps {
+	/**
+	 * Optional name for the track.
+	 */
+	name?: string;
+}
+
+/**
  * Represents a track that contains a collection of events.
  *
  * Tracks are used to organize events and can be added to a project.
@@ -29,6 +39,9 @@ export class Track {
 	/** Unique identifier for the track */
 	readonly id: string;
 
+	/** Name of the track */
+	readonly name: string;
+
 	/** The events contained in this track, sorted by time. */
 	private readonly events: ReadonlyArray<Event>;
 
@@ -36,10 +49,12 @@ export class Track {
 	 * Creates a new track instance.
 	 *
 	 * @param id - Unique identifier for the track
+	 * @param name - Optional name for the track
 	 * @param events - Optional initial events to include in the track
 	 */
-	constructor(id: string, events: Event[] = []) {
+	constructor(id: string, name = "", events: Event[] = []) {
 		this.id = id;
+		this.name = name;
 
 		// Validate that all items in events are Event instances
 		for (let i = 0; i < events.length; i++) {
@@ -58,11 +73,12 @@ export class Track {
 	/**
 	 * Creates a new track instance with an automatically generated ID.
 	 *
+	 * @param props - Optional properties for the track
 	 * @param events - Optional initial events to include in the track
 	 * @returns A new Track instance with a generated ID
 	 */
-	static create(events: Event[] = []): Track {
-		return new Track(generateId(), events);
+	static create(props?: TrackProps, events: Event[] = []): Track {
+		return new Track(generateId(), props?.name, events);
 	}
 
 	/**
@@ -83,7 +99,7 @@ export class Track {
 		const newEvents = [...this.events, event];
 
 		// Return a new Track instance with the updated events
-		return new Track(this.id, newEvents);
+		return new Track(this.id, this.name, newEvents);
 	}
 
 	/**
@@ -94,7 +110,7 @@ export class Track {
 	 */
 	removeEvent(eventId: string): Track {
 		const newEvents = this.events.filter((e) => e.id !== eventId);
-		return new Track(this.id, newEvents);
+		return new Track(this.id, this.name, newEvents);
 	}
 
 	/**

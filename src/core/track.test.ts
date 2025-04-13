@@ -27,7 +27,7 @@ describe("Track", () => {
 		it("creates a track with the provided events", () => {
 			const note1 = createNote(480);
 			const note2 = createNote(960);
-			const track = new Track(generateId(), [note1, note2]);
+			const track = new Track(generateId(), "", [note1, note2]);
 
 			expect(track.getEvents().length).toBe(2);
 			expect(track.getEvents()[0]).toBe(note1);
@@ -37,7 +37,7 @@ describe("Track", () => {
 		it("sorts events by time", () => {
 			const note1 = createNote(960);
 			const note2 = createNote(480);
-			const track = new Track(generateId(), [note1, note2]);
+			const track = new Track(generateId(), "", [note1, note2]);
 
 			expect(track.getEvents().length).toBe(2);
 			expect(track.getEvents()[0]).toBe(note2); // note2 has earlier time
@@ -46,7 +46,7 @@ describe("Track", () => {
 
 		it("throws an error if any provided event is not an Event instance", () => {
 			expect(() => {
-				new Track(generateId(), [
+				new Track(generateId(), "", [
 					createNote(480),
 					"not an event" as unknown as Note,
 				]);
@@ -65,7 +65,7 @@ describe("Track", () => {
 		it("creates a track with the provided events", () => {
 			const note1 = createNote(480);
 			const note2 = createNote(960);
-			const track = Track.create([note1, note2]);
+			const track = Track.create(undefined, [note1, note2]);
 
 			expect(track.id).toBeDefined();
 			expect(typeof track.id).toBe("string");
@@ -91,7 +91,7 @@ describe("Track", () => {
 
 		it("maintains event order when adding events", () => {
 			const note1 = createNote(960);
-			const track = new Track(generateId(), [note1]);
+			const track = new Track(generateId(), "", [note1]);
 
 			const note2 = createNote(480);
 			const updatedTrack = track.addEvent(note2);
@@ -113,7 +113,7 @@ describe("Track", () => {
 		it("removes an event from the track by its ID", () => {
 			const note1 = createNote(480);
 			const note2 = createNote(960);
-			const track = new Track(generateId(), [note1, note2]);
+			const track = new Track(generateId(), "", [note1, note2]);
 
 			const updatedTrack = track.removeEvent(note1.id);
 
@@ -127,7 +127,7 @@ describe("Track", () => {
 
 		it("returns a new track with the same events if the event ID to remove is not found", () => {
 			const note1 = createNote(480);
-			const track = new Track(generateId(), [note1]);
+			const track = new Track(generateId(), "", [note1]);
 
 			// Use a non-existent ID
 			const nonExistentId = "non-existent-id";
@@ -143,7 +143,7 @@ describe("Track", () => {
 			const note1 = createNote(480);
 			const note2 = createNote(960);
 			const note3 = createNote(1440);
-			const track = new Track(generateId(), [note1, note2, note3]);
+			const track = new Track(generateId(), "", [note1, note2, note3]);
 
 			const eventsInRange = track.getEventsInRange(500, 1000);
 
@@ -154,7 +154,7 @@ describe("Track", () => {
 		it("includes events at the range boundaries", () => {
 			const note1 = createNote(480);
 			const note2 = createNote(960);
-			const track = new Track(generateId(), [note1, note2]);
+			const track = new Track(generateId(), "", [note1, note2]);
 
 			const eventsInRange = track.getEventsInRange(480, 960);
 
@@ -166,7 +166,7 @@ describe("Track", () => {
 		it("returns an empty array if no events are in the range", () => {
 			const note1 = createNote(480);
 			const note2 = createNote(960);
-			const track = new Track(generateId(), [note1, note2]);
+			const track = new Track(generateId(), "", [note1, note2]);
 
 			const eventsInRange = track.getEventsInRange(1000, 2000);
 
@@ -174,7 +174,7 @@ describe("Track", () => {
 		});
 
 		it("throws an error if the range is invalid", () => {
-			const track = new Track(generateId(), [createNote(480)]);
+			const track = new Track(generateId(), "", [createNote(480)]);
 
 			expect(() => {
 				track.getEventsInRange(-100, 500);
@@ -190,7 +190,7 @@ describe("Track", () => {
 		it("returns all events in the track", () => {
 			const note1 = createNote(480);
 			const note2 = createNote(960);
-			const track = new Track(generateId(), [note1, note2]);
+			const track = new Track(generateId(), "", [note1, note2]);
 
 			const events = track.getEvents();
 

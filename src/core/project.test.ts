@@ -19,9 +19,9 @@ describe("Project", () => {
 	};
 
 	// Helper function to create a track with notes
-	const createTrack = (noteTimes: number[] = []) => {
+	const createTrack = (noteTimes: number[] = [], name = "") => {
 		const notes = noteTimes.map((time) => createNote(time));
-		return Track.create(notes);
+		return Track.create({ name }, notes);
 	};
 
 	describe("constructor", () => {
@@ -52,8 +52,7 @@ describe("Project", () => {
 	describe("addTrack", () => {
 		it("adds a track to the project", () => {
 			const project = new Project();
-			const track = createTrack([480]);
-			const updatedProject = project.addTrack(track);
+			const [updatedProject, track] = project.addTrack({ name: "Test Track" });
 
 			// Original project should be unchanged
 			expect(project.getTracks().length).toBe(0);
@@ -62,13 +61,15 @@ describe("Project", () => {
 			expect(updatedProject.getTracks().length).toBe(1);
 			expect(updatedProject.getTracks()[0]).toBe(track);
 			expect(updatedProject.getTrackCount()).toBe(1);
+			expect(track.name).toBe("Test Track");
 		});
 
-		it("throws an error if the provided track is not a Track instance", () => {
+		it("creates a track with default properties when no props are provided", () => {
 			const project = new Project();
-			expect(() => {
-				project.addTrack("not a track" as unknown as Track);
-			}).toThrow(InvalidArgumentError);
+			const [updatedProject, track] = project.addTrack();
+
+			expect(updatedProject.getTracks().length).toBe(1);
+			expect(track.name).toBe("");
 		});
 	});
 
@@ -149,12 +150,10 @@ describe("Project", () => {
 			const project = new Project();
 			expect(project.getTrackCount()).toBe(0);
 
-			const track = createTrack([480]);
-			const updatedProject = project.addTrack(track);
+			const [updatedProject] = project.addTrack({ name: "Track 1" });
 			expect(updatedProject.getTrackCount()).toBe(1);
 
-			const anotherTrack = createTrack([960]);
-			const finalProject = updatedProject.addTrack(anotherTrack);
+			const [finalProject] = updatedProject.addTrack({ name: "Track 2" });
 			expect(finalProject.getTrackCount()).toBe(2);
 		});
 	});
@@ -197,7 +196,7 @@ describe("Project", () => {
 	describe("removeEvent", () => {
 		it("removes an event from a track in the project", () => {
 			const note = createNote(480);
-			const track = Track.create([note]);
+			const track = Track.create(undefined, [note]);
 			const project = new Project([track]);
 
 			const updatedProject = project.removeEvent(track.id, note.id);
@@ -212,7 +211,7 @@ describe("Project", () => {
 
 		it("throws an error if the track is not found", () => {
 			const note = createNote(480);
-			const track = Track.create([note]);
+			const track = Track.create(undefined, [note]);
 			const project = new Project([track]);
 
 			expect(() => {
@@ -222,7 +221,7 @@ describe("Project", () => {
 
 		it("returns a new project with the same tracks if the event to remove is not found", () => {
 			const note = createNote(480);
-			const track = Track.create([note]);
+			const track = Track.create(undefined, [note]);
 			const project = new Project([track]);
 
 			// Use a non-existent ID
@@ -244,8 +243,8 @@ describe("Project", () => {
 			const note4 = createNote(400);
 			const note5 = createNote(500);
 
-			const track1 = Track.create([note1, note3, note5]);
-			const track2 = Track.create([note2, note4]);
+			const track1 = Track.create(undefined, [note1, note3, note5]);
+			const track2 = Track.create(undefined, [note2, note4]);
 			const project = new Project([track1, track2]);
 
 			// Get events in range 150-350
@@ -263,7 +262,7 @@ describe("Project", () => {
 		it("returns an empty array if no events are within the specified range", () => {
 			const note1 = createNote(100);
 			const note2 = createNote(200);
-			const track = Track.create([note1, note2]);
+			const track = Track.create(undefined, [note1, note2]);
 			const project = new Project([track]);
 
 			const eventsInRange = project.getEventsInRange(300, 400);
@@ -294,8 +293,8 @@ describe("Project", () => {
 			const note4 = createNote(200);
 			const note5 = createNote(400);
 
-			const track1 = Track.create([note1, note3, note5]);
-			const track2 = Track.create([note2, note4]);
+			const track1 = Track.create(undefined, [note1, note3, note5]);
+			const track2 = Track.create(undefined, [note2, note4]);
 			const project = new Project([track1, track2]);
 
 			const allEvents = project.getEvents();
@@ -311,7 +310,7 @@ describe("Project", () => {
 		});
 
 		it("returns an empty array for a project with no events", () => {
-			const track = Track.create([]);
+			const track = Track.create();
 			const project = new Project([track]);
 
 			const allEvents = project.getEvents();
