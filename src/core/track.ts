@@ -3,6 +3,35 @@ import { InvalidArgumentError } from "./errors.js";
 import { Event } from "./events/base.js";
 
 /**
+ * Interface for track objects that exposes only read-only properties and methods.
+ *
+ * This interface is used to prevent direct modification of tracks outside of the Project aggregate root.
+ */
+export interface ITrack {
+	/** Unique identifier for the track */
+	readonly id: string;
+
+	/** Name of the track */
+	readonly name: string;
+
+	/**
+	 * Gets all events within a specific time range.
+	 *
+	 * @param startTicks - The start time in ticks
+	 * @param endTicks - The end time in ticks
+	 * @returns An array of events within the specified range
+	 */
+	getEventsInRange(startTicks: number, endTicks: number): Event[];
+
+	/**
+	 * Gets all events in this track.
+	 *
+	 * @returns An array of all events in the track
+	 */
+	getEvents(): Event[];
+}
+
+/**
  * Properties for creating a track.
  */
 export interface TrackProps {
@@ -25,17 +54,22 @@ export interface TrackProps {
  * import { Ticks } from "./values/time.js";
  * import { Velocity } from "./values/velocity.js";
  *
- * const track = new Track();
+ * // Tracks should only be created and modified through the Project aggregate root
+ * const project = new Project();
+ * const [updatedProject, track] = project.addTrack({ name: "Piano" });
+ *
  * const note = new Note(
  *   new Ticks(480),
  *   new Pitch(60),
  *   new Velocity(100),
  *   new Ticks(240)
  * );
- * const updatedTrack = track.addEvent(note);
+ *
+ * // Events should be added through the Project
+ * const finalProject = updatedProject.addEvent(track.id, note);
  * ```
  */
-export class Track {
+export class Track implements ITrack {
 	/** Unique identifier for the track */
 	readonly id: string;
 

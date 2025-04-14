@@ -1,6 +1,6 @@
 import { InvalidArgumentError } from "./errors.js";
 import { Event } from "./events/base.js";
-import { Track, type TrackProps } from "./track.js";
+import { type ITrack, Track, type TrackProps } from "./track.js";
 
 /**
  * Represents a project that contains a collection of tracks.
@@ -74,9 +74,9 @@ export class Project {
 	 * Creates a new track with the given properties and adds it to the project.
 	 *
 	 * @param props - Optional properties for the new track
-	 * @returns A tuple containing the new Project instance and the created Track
+	 * @returns A tuple containing the new Project instance and the created Track as ITrack
 	 */
-	addTrack(props?: TrackProps): [Project, Track] {
+	addTrack(props?: TrackProps): [Project, ITrack] {
 		// Create a new track with the given properties
 		const track = Track.create(props);
 
@@ -128,9 +128,9 @@ export class Project {
 	/**
 	 * Gets all tracks in this project.
 	 *
-	 * @returns An array of all tracks in the project
+	 * @returns An array of all tracks in the project as ITrack
 	 */
-	getTracks(): Track[] {
+	getTracks(): ITrack[] {
 		return Array.from(this.tracks.values());
 	}
 
@@ -138,9 +138,21 @@ export class Project {
 	 * Gets a track by its ID.
 	 *
 	 * @param trackId - The ID of the track to get
-	 * @returns The track with the specified ID, or undefined if not found
+	 * @returns The track with the specified ID as ITrack, or undefined if not found
 	 */
-	getTrack(trackId: string): Track | undefined {
+	getTrack(trackId: string): ITrack | undefined {
+		return this.getTrackInternal(trackId);
+	}
+
+	/**
+	 * Gets a track by its ID for internal use.
+	 * This method is for internal use only and returns the full Track instance.
+	 *
+	 * @param trackId - The ID of the track to get
+	 * @returns The track with the specified ID, or undefined if not found
+	 * @internal
+	 */
+	private getTrackInternal(trackId: string): Track | undefined {
 		return this.tracks.get(trackId);
 	}
 
@@ -162,7 +174,8 @@ export class Project {
 	 * @throws {InvalidArgumentError} If the track is not found or event is not a valid Event instance
 	 */
 	addEvent(trackId: string, event: Event): Project {
-		const track = this.getTrack(trackId);
+		// Get the track and ensure it exists
+		const track = this.getTrackInternal(trackId);
 		if (!track) {
 			throw new InvalidArgumentError(
 				`Cannot add event to track: Track with ID ${trackId} not found`,
@@ -199,7 +212,8 @@ export class Project {
 	 * @throws {InvalidArgumentError} If the track is not found
 	 */
 	removeEvent(trackId: string, eventId: string): Project {
-		const track = this.getTrack(trackId);
+		// Get the track and ensure it exists
+		const track = this.getTrackInternal(trackId);
 		if (!track) {
 			throw new InvalidArgumentError(
 				`Cannot remove event from track: Track with ID ${trackId} not found`,
