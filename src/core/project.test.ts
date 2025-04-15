@@ -158,12 +158,18 @@ describe("Project", () => {
 		});
 	});
 
-	describe("addEvent", () => {
-		it("adds an event to a track in the project", () => {
+	describe("addNoteEvent", () => {
+		it("adds a note event to a track in the project", () => {
 			const track = createTrack([]);
 			const project = new Project([track]);
 			const note = createNote(480);
-			const updatedProject = project.addEvent(track.id, note);
+			const [updatedProject, createdNote] = project.addNoteEvent(
+				track.id,
+				note.time,
+				note.pitch,
+				note.velocity,
+				note.duration
+			);
 
 			// Original project should be unchanged
 			expect(project.getTrack(track.id)?.getEvents().length).toBe(0);
@@ -171,7 +177,12 @@ describe("Project", () => {
 			// New project should have the track with the event
 			const updatedTrack = updatedProject.getTrack(track.id);
 			expect(updatedTrack?.getEvents().length).toBe(1);
-			expect(updatedTrack?.getEvents()[0]).toBe(note);
+			
+			// Verify the created note has the correct properties
+			expect(createdNote.time.value).toBe(note.time.value);
+			expect(createdNote.pitch.value).toBe(note.pitch.value);
+			expect(createdNote.velocity.value).toBe(note.velocity.value);
+			expect(createdNote.duration.value).toBe(note.duration.value);
 		});
 
 		it("throws an error if the track is not found", () => {
@@ -179,16 +190,41 @@ describe("Project", () => {
 			const note = createNote(480);
 
 			expect(() => {
-				project.addEvent("non-existent-track-id", note);
+				project.addNoteEvent(
+					"non-existent-track-id",
+					note.time,
+					note.pitch,
+					note.velocity,
+					note.duration
+				);
 			}).toThrow(InvalidArgumentError);
 		});
 
-		it("throws an error if the provided event is not an Event instance", () => {
+		it("throws an error if any parameter is invalid", () => {
 			const track = createTrack([]);
 			const project = new Project([track]);
+			const note = createNote(480);
 
+			// Test with invalid time
 			expect(() => {
-				project.addEvent(track.id, "not an event" as unknown as Note);
+				project.addNoteEvent(
+					track.id,
+					"not a ticks" as unknown as Ticks,
+					note.pitch,
+					note.velocity,
+					note.duration
+				);
+			}).toThrow(InvalidArgumentError);
+
+			// Test with invalid pitch
+			expect(() => {
+				project.addNoteEvent(
+					track.id,
+					note.time,
+					"not a pitch" as unknown as Pitch,
+					note.velocity,
+					note.duration
+				);
 			}).toThrow(InvalidArgumentError);
 		});
 	});

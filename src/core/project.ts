@@ -1,6 +1,10 @@
 import { InvalidArgumentError } from "./errors.js";
 import { Event } from "./events/base.js";
+import { Note } from "./events/note.js";
 import { type ITrack, Track, type TrackProps } from "./track.js";
+import type { Pitch } from "./values/pitch.js";
+import type { Ticks } from "./values/time.js";
+import type { Velocity } from "./values/velocity.js";
 
 /**
  * Represents a project that contains a collection of tracks.
@@ -166,6 +170,34 @@ export class Project {
 	}
 
 	/**
+	 * Adds a note event to a specific track in the project.
+	 *
+	 * @param trackId - The ID of the track to add the note to
+	 * @param time - The time at which the note starts
+	 * @param pitch - The pitch value
+	 * @param velocity - The velocity/intensity value
+	 * @param duration - The duration of the note
+	 * @returns A tuple containing the new Project instance and the created Note
+	 * @throws {InvalidArgumentError} If the track is not found or any parameter is invalid
+	 */
+	addNoteEvent(
+		trackId: string,
+		time: Ticks,
+		pitch: Pitch,
+		velocity: Velocity,
+		duration: Ticks,
+	): [Project, Note] {
+		// Create a new note event
+		const note = Note.create(time, pitch, velocity, duration);
+
+		// Add the note to the project
+		const newProject = this.addEventInternal(trackId, note);
+
+		// Return both the new project and the created note
+		return [newProject, note];
+	}
+
+	/**
 	 * Adds an event to a specific track in the project.
 	 *
 	 * @param trackId - The ID of the track to add the event to
@@ -173,7 +205,7 @@ export class Project {
 	 * @returns A new Project instance with the added event
 	 * @throws {InvalidArgumentError} If the track is not found or event is not a valid Event instance
 	 */
-	addEvent(trackId: string, event: Event): Project {
+	private addEventInternal(trackId: string, event: Event): Project {
 		// Get the track and ensure it exists
 		const track = this.getTrackInternal(trackId);
 		if (!track) {
