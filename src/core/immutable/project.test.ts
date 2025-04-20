@@ -168,7 +168,7 @@ describe("Project", () => {
 				note.time,
 				note.pitch,
 				note.velocity,
-				note.duration
+				note.duration,
 			);
 
 			// Original project should be unchanged
@@ -177,7 +177,7 @@ describe("Project", () => {
 			// New project should have the track with the event
 			const updatedTrack = updatedProject.getTrack(track.id);
 			expect(updatedTrack?.getEvents().length).toBe(1);
-			
+
 			// Verify the created note has the correct properties
 			expect(createdNote.time.value).toBe(note.time.value);
 			expect(createdNote.pitch.value).toBe(note.pitch.value);
@@ -195,7 +195,7 @@ describe("Project", () => {
 					note.time,
 					note.pitch,
 					note.velocity,
-					note.duration
+					note.duration,
 				);
 			}).toThrow(InvalidArgumentError);
 		});
@@ -212,7 +212,7 @@ describe("Project", () => {
 					"not a ticks" as unknown as Ticks,
 					note.pitch,
 					note.velocity,
-					note.duration
+					note.duration,
 				);
 			}).toThrow(InvalidArgumentError);
 
@@ -223,7 +223,7 @@ describe("Project", () => {
 					note.time,
 					"not a pitch" as unknown as Pitch,
 					note.velocity,
-					note.duration
+					note.duration,
 				);
 			}).toThrow(InvalidArgumentError);
 		});
