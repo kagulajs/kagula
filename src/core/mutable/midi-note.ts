@@ -1,5 +1,5 @@
 import type { MidiPitch, MidiVelocity } from "./midi-values.js";
-import type { Ticks } from "./time.js";
+import type { Ticks } from "./values/ticks.js";
 
 /**
  * Interface for a MIDI note within a sequence.

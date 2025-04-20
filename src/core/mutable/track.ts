@@ -1,7 +1,8 @@
 import type { AudioTrack } from "./audio-track.js";
 import type { MidiTrack } from "./midi-track.js";
 import type { Project } from "./project.js";
-import type { Pan, Volume } from "./values.js";
+import type { Pan } from "./values/pan.js";
+import type { Volume } from "./values/volume.js";
 
 /**
  * Interface for a track that can contain clips.

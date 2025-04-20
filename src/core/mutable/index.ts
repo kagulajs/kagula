@@ -5,8 +5,6 @@ export * from "./midi-track.js";
 export * from "./midi-values.js";
 export * from "./clip.js";
 export * from "./project.js";
-export * from "./time.js";
 export * from "./track.js";
-export * from "./values.js";
 export * from "./audio-source.js";
 export * from "./midi-sequence.js";

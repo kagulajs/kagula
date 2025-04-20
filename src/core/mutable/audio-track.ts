@@ -1,7 +1,7 @@
 import type { AudioSource } from "./audio-source.js";
 import type { AudioClip } from "./clip.js";
-import type { Ticks } from "./time.js";
 import type { Track } from "./track.js";
+import type { Ticks } from "./values/ticks.js";
 
 /**
  * Interface for an audio track that can contain audio clips.

@@ -1,7 +1,7 @@
 import type { AudioSource } from "./audio-source.js";
 import type { MidiSequence } from "./midi-sequence.js";
-import type { Ticks } from "./time.js";
 import type { Track } from "./track.js";
+import type { Ticks } from "./values/ticks.js";
 
 /**
  * Interface for a clip that can be placed on a track.

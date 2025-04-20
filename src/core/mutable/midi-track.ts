@@ -1,6 +1,6 @@
 import type { MidiClip } from "./clip.js";
-import type { Ticks } from "./time.js";
 import type { Track } from "./track.js";
+import type { Ticks } from "./values/ticks.js";
 
 /**
  * Interface for a MIDI track that can contain MIDI clips.

@@ -1,7 +1,8 @@
 import type { AudioTrack } from "./audio-track.js";
 import type { MidiTrack } from "./midi-track.js";
 import type { Track } from "./track.js";
-import type { Tempo, TimeSignature } from "./values.js";
+import type { Tempo } from "./values/tempo.js";
+import type { TimeSignature } from "./values/time-signature.js";
 
 /**
  * Interface for a project that manages tracks and global settings.
